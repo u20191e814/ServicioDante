@@ -277,10 +277,18 @@ namespace ServicioWeb_BD
                                 if (fechasOutputs != null)
                                 {
                                     fechasOutputs = fechasOutputs.OrderBy(v => v.fechaEstado).ToList();
-                                     
+                                    
                                     bool estado = false;
                                     while (!estado)
                                     {
+                                        if (fechasOutputs.Count==1)
+                                        {
+                                            if (fechasOutputs[0].estado != "Activo")
+                                            {
+                                                estado = true;
+                                                continue;
+                                            }
+                                        }
                                         DateTime inicio = DateTime.MinValue;
                                         DateTime fechacorte = DateTime.MinValue;
                                         if (fechasOutputs.Count > 0)
@@ -289,6 +297,7 @@ namespace ServicioWeb_BD
                                             float precioActual = fechasOutputs[0].precio;
                                             string servicioActual = fechasOutputs[0].servicio;
                                             fechasOutputs.RemoveAt(0);
+                                            
                                             if (fechasOutputs .Count==0)
                                             {
                                                 DateTime fechacortePosible = new DateTime(fact.Year, fact.Month, 1);

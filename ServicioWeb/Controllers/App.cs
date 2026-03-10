@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
@@ -6,6 +7,7 @@ using ServicioWeb_BD;
 using ServicioWeb_Entidades;
 using ServicioWeb_Entidades.Clientes;
 using ServicioWeb_Entidades.Usuarios;
+using System.ComponentModel.DataAnnotations;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -221,6 +223,65 @@ namespace ServicioWeb.Controllers
 
         }
 
+        ///<remarks>
+        ///
+        /// Se resetea la clave del cliente para ingresar al app        
+        ///     
+        /// RESPUESTAS          
+        /// 
+        /// Correcto:
+        /// 
+        ///     {
+        ///         "Status" : "OK",
+        ///         "Data" : True,
+        ///         "StatusCode":"0",
+        ///         "StatusMessage" : "OK",
+        ///         "InternalMessage":"",
+        ///          
+        ///     }             
+        /// 
+        /// Incorrecto:
+        ///  
+        ///     {
+        ///         "Status" : "400",
+        ///         "Data" : False,
+        ///         "StatusCode":"XX",
+        ///         "StatusMessage" : "Mensaje del error",
+        ///         "InternalMessage":"Detalle del error",
+        ///         
+        ///     } 
+        ///     
+        /// |Http code |Status| Data | StatusCode| StatusMessage|InternalMessage|
+        /// |----------|-------|------|------------|---------|------|        
+        /// |200|400| 0 |D1|Database error| |
+        /// |200|400| 0 |C4|User does not exist| |       
+        /// 
+        ///</remarks>
+        ///<response code="401">It's not authorized</response>
+        ///<response code="200">Success</response>
+        ///<response code="400">Required fields</response>
+        ///<response code="404">Route not found</response>
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [HttpPost]
+        [Route("api/app/resetclient/")]
+        public StructurePostBool resetclient([Required][Range(1, long.MaxValue)] long  id_client)
+        {
+            StructurePostBool estructura = new();
+            estructura.Status = "400";
+            //return estructura;
+            StructurePostBool pusuario = new Db_Clientes(AE.Decrypt(_config["Sqlconnetion"])).ResetloginClient(id_client);
+            if (!string.IsNullOrEmpty(pusuario.InternalMessage))
+            {
+                estructura.StatusCode = "D1";
+                estructura.StatusMessage = "Database error ";
+                estructura.InternalMessage = pusuario.InternalMessage;
+                return estructura;
+            }
+
+
+            return pusuario;
+
+        }
 
     }
 }

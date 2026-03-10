@@ -328,5 +328,24 @@ namespace ServicioWeb_BD
                 return -1;
             }
         }
+
+        public StructurePostBool ResetloginClient(long id_client)
+        {
+            StructurePostBool structurePostInt = new StructurePostBool();
+            try
+            {
+                using (SqlConnection cn = new SqlConnection(conexioAlent))
+                {
+                    string squery = string.Format("  update [SistemaWeb].[web].[Clients] set password=null where Pk_clients ={0}", id_client);
+                    cn.Execute(squery);
+                }
+                structurePostInt.Data = true;
+            }
+            catch (Exception ex)
+            {
+                structurePostInt.InternalMessage = ex.Message;
+            }
+            return structurePostInt;
+        }
     }
 }

@@ -421,11 +421,19 @@ namespace ServicioWeb_BD
                             {
                                 fechasOutputs = fechasOutputs.OrderBy(v => v.fechaEstado).ToList();
 
+                               
 
-                                 
                                 bool estado2 = false;
                                 while (!estado2)
                                 {
+                                    if (fechasOutputs.Count == 1)
+                                    {
+                                        if (fechasOutputs[0].estado != "Activo")
+                                        {
+                                            estado2 = true;
+                                            continue;
+                                        }
+                                    }
                                     DateTime inicio = DateTime.MinValue;
                                     DateTime fechacorte = DateTime.MinValue;
                                     if (fechasOutputs.Count > 0)
